@@ -1,31 +1,26 @@
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
+import { User } from '@/types/user.type';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface UserState {
-    id: number,
-    fullName: string,
-    email: string,
-}
-
-const initialState: UserState = {
+const initialState: User = {
   id: 0,
-  fullName: "",
-  email: "",
+  fullName: '',
+  email: '',
 };
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
-    loginAction: (state, action: PayloadAction<UserState>) => {
+    loginAction: (state, action: PayloadAction<User>) => {
       state.id = action.payload.id;
       state.fullName = action.payload.fullName;
       state.email = action.payload.email;
     },
     logoutAction: (state) => {
       state.id = 0;
-      state.fullName = "";
-      state.email = "";
+      state.fullName = '';
+      state.email = '';
     },
   },
 });

@@ -1,25 +1,33 @@
 'use client';
 
 import Forminput from '@/components/Forminput';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFormik } from 'formik';
 import { validationSchema } from './validationSchema';
-import useLogin from '@/hooks/api/auth/useLogin';
-import { useRouter } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
+import useResetPassword from '@/hooks/api/auth/useResetPassword';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
-const Login = () => {
-  const router = useRouter();
-  const { login } = useLogin();
+const ResetPassword = () => {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
+  if (!token) {
+    notFound();
+  }
+
+  const { resetPassword, isLoading } = useResetPassword();
+
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
     useFormik({
       initialValues: {
-        email: '',
         password: '',
+        confirmPassword: '',
       },
       validationSchema,
-      onSubmit: (values) => {
-        login(values);
+      onSubmit: ({ password }) => {
+        resetPassword(password, token);
       },
     });
 
@@ -29,24 +37,12 @@ const Login = () => {
         <Card className="w-[450px]">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-primary">
-              Login
+              Reset Password
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
               <div className="grid w-full items-center gap-4">
-                <Forminput
-                  name="email"
-                  type="text"
-                  label="Email"
-                  placeholder="Email"
-                  value={values.email}
-                  error={errors.email}
-                  isError={!!touched.email && !!errors.email}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                />
-
                 <Forminput
                   name="password"
                   type="password"
@@ -58,14 +54,25 @@ const Login = () => {
                   handleChange={handleChange}
                   handleBlur={handleBlur}
                 />
-                <p
-                  className="text-end cursor-pointer text-xs"
-                  onClick={() => router.push('/forgot-password')}
-                >
-                  Forgot Password?
-                </p>
+
+                <Forminput
+                  name="confirmPassword"
+                  type="password"
+                  label="Confirm Password"
+                  placeholder="Confirm Password"
+                  value={values.confirmPassword}
+                  error={errors.confirmPassword}
+                  isError={
+                    !!touched.confirmPassword && !!errors.confirmPassword
+                  }
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                />
               </div>
-              <Button className="mt-6 w-full">Login</Button>
+              <Button className="mt-6 w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? 'Loading' : 'Submit'}
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -73,4 +80,4 @@ const Login = () => {
     </main>
   );
 };
-export default Login;
+export default ResetPassword;
